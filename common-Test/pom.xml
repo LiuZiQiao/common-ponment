@@ -9,7 +9,7 @@
   <version>${rversion}</version>
 
   <parent>
-    <artifactId>common-ponment</artifactId>
+    <artifactId>common-component</artifactId>
     <groupId>org.lxk</groupId>
     <version>${revision}</version>
     <relativePath>../</relativePath>
