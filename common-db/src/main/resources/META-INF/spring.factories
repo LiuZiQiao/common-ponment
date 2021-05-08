@@ -1,0 +1,4 @@
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.lxk.project.common.db.AllowBeanDefinitionOverridingEnvironmentProcessor
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.lxk.project.common.db.DynamicDataSourceConfiguration
