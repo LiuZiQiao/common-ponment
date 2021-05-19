@@ -30,6 +30,10 @@
       <groupId>com.lxk.project</groupId>
       <artifactId>common-db</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.lxk.project</groupId>
+      <artifactId>common-utils</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

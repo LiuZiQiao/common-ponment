@@ -1,4 +1,4 @@
-package com.lxk.project.po;
+package com.lxk.project.common.po;
 
 import java.io.Serializable;
 
