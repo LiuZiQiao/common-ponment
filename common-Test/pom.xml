@@ -4,14 +4,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.lxk</groupId>
+  <groupId>com.lxk.project</groupId>
   <artifactId>common-Test</artifactId>
   <version>${rversion}</version>
 
   <parent>
     <artifactId>common-component</artifactId>
-    <groupId>org.lxk</groupId>
-    <version>${revision}</version>
+    <groupId>com.lxk.project</groupId>
+    <version>1.0.0-SNAPSHOT</version>
     <relativePath>../</relativePath>
   </parent>
 
@@ -27,7 +27,7 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.lxk</groupId>
+      <groupId>com.lxk.project</groupId>
       <artifactId>common-db</artifactId>
     </dependency>
   </dependencies>
