@@ -7,6 +7,7 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -33,7 +34,7 @@ public class ExcelUtils {
      * @param file
      * @return Map<String,Object>
      */
-    public ResultWrapper parseExcel(MultipartFile file) {
+    public static ResultWrapper parseExcel(MultipartFile file) {
 
         if (Objects.isNull(file)) {
             return ResultWrapper.error("文件不能为空");
@@ -75,7 +76,7 @@ public class ExcelUtils {
      * @param isSheets
      * @return
      */
-    public ResultWrapper parseExcel(MultipartFile file,boolean isSheets) {
+    public static ResultWrapper parseExcel(MultipartFile file,boolean isSheets) {
 
         if (Objects.isNull(file)) {
             return ResultWrapper.error("文件不能为空");
@@ -212,7 +213,7 @@ public class ExcelUtils {
         return true;
     }
 
-    public static Object replaceBlank(String string) {
+    private static Object replaceBlank(String string) {
         if(StringUtils.isNotEmpty(string)){
             string = StringUtils.trim(string);
             Pattern p = compile("\t|\r|\n");
@@ -220,6 +221,24 @@ public class ExcelUtils {
             string = m.replaceAll("");
         }
         return string;
+    }
+
+
+    /**
+     *
+     * @param list
+     * @param title
+     * @param sheetName
+     * @param pojoClass
+     * @param fileName
+     * @param response
+     */
+    public static void exportExcel(List<?> list, String title, String sheetName, Class<?> pojoClass,String fileName, HttpServletResponse response){
+
+    }
+
+    public static void downLoadExcel(String fileName, HttpServletResponse response, Workbook workbook){
+
     }
 
 }

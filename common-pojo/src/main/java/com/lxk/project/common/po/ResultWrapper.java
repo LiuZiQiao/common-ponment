@@ -34,13 +34,16 @@ public class ResultWrapper<T> implements Serializable {
         return new ResultWrapper(ERROR_CODE,message);
     }
 
+    public static <E> ResultWrapper<E> error(){
+        return new ResultWrapper(ERROR_CODE,ERROR_MESSAGE);
+    }
+
     public ResultWrapper() {
         this(SUCCESS_CODE,SUCCESS_MESSAGE);
     }
 
 
     public ResultWrapper(Integer code, String message, T result) {
-        super();
         this.code(code).message(message).result(result);
     }
 
@@ -50,17 +53,17 @@ public class ResultWrapper<T> implements Serializable {
 
 
     private ResultWrapper<T> code(Integer code) {
-        this.code(code);
+        this.setCode(code);
         return this;
     }
 
     private ResultWrapper<T> message(String message) {
-        this.message(message);
+        this.setMessage(message);
         return this;
     }
 
     private ResultWrapper<T> result(T result) {
-        this.result(result);
+        this.setResult(result);
         return this;
     }
 
