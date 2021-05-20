@@ -1,7 +1,9 @@
 package com.lxk.project.excelTest;
 
+import com.lxk.project.common.po.ResultWrapper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @Description TODO
@@ -14,9 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/excelTest")
 public class ExcelTestController {
-//
-//    @RequestMapping("parse")
-//    public ResultW(){
-//
-//    }
+
+
+    public ResultWrapper parseFile(MultipartFile file){
+
+        return ResultWrapper.success();
+    }
 }
