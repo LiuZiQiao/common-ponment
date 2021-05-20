@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description TODO
@@ -36,7 +38,12 @@ public class ExcelTestController {
             users.add(new User(1,"lxk"+i,"a"+i,i,i));
         }
 
-        String title = "id,name,password,age,flag";
-        ExcelUtils.exportExcel(users,title,"测试",User.class,"测试",response);
+        Map header = new HashMap<>();
+        header.put("id","id");
+        header.put("name","name");
+        header.put("password","password");
+        header.put("age","age");
+        header.put("deleteFlag","deleteFlag");
+        ExcelUtils.exportExcel("测试","测试",header,users,response);
     }
 }

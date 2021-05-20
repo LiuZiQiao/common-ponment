@@ -2,13 +2,26 @@ package com.lxk.project.common.utils;
 
 import com.lxk.project.common.po.DateStyle;
 import com.lxk.project.common.po.ResultWrapper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -250,8 +263,82 @@ public class ExcelUtils {
      * @param header 表格头
      * @param body 表格数据
      */
-    public static void export(HttpServletResponse response, String filename, String sheetName, Map<String, String> header, List body) {
+    public static void exportExcel(String filename, String sheetName, Map<String, String> header, List body,HttpServletResponse response) {
+//大于csvSize行时导出csv格式
+        if(CollectionUtils.isNotEmpty(body) && body.size() > csvSize){
+            exportCsv(response, filename, header, body);
+        }
+        else{//导出excel格式
+            exportExcel(response, filename, sheetName, header, body);
+        }
+    }
 
+    /**
+     * 导出CSV格式文件
+     * @param response HttpServletResponse
+     * @param filename 文件名前缀
+     * @param header 表格头
+     * @param body 表格数据
+     */
+    public static void exportCsv(HttpServletResponse response, String filename, Map<String, String> header, List body) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/csv;charset=UTF-8");
+        try {
+            String S = filename + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".csv";
+            response.setHeader("Content-Disposition",
+                    "attachment;filename=" + URLEncoder.encode(S, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("导出失败！", e);
+        }
+        try {
+            Csv.export(response.getOutputStream(), header, body);
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        } catch (Exception e) {
+            throw new RuntimeException("导出失败！", e);
+        }
+    }
+
+    static class Csv{
+        public static void export(
+                OutputStream outputStream,
+                Map<String, String> header,
+                List<? extends Object> body
+        ) throws IOException, IllegalAccessException, IntrospectionException, InvocationTargetException {
+            //解析csv文件时，中文Windows系统下，Excel默认GBK编码读取文件。而WPS默认UTF-8编码读取文件。
+            //以下三行给文件插入BOM头，强制已UTF-8编码读取文件
+            outputStream.write(0xEF);
+            outputStream.write(0xBB);
+            outputStream.write(0xBF);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            Collection<String> headerCollection = header.values();
+            String[] headerArr = new String[headerCollection.size()];
+            headerCollection.toArray(headerArr);
+            CSVFormat csvFormat = CSVFormat.DEFAULT.withHeader(headerArr);
+            try(CSVPrinter csvPrinter = new CSVPrinter(outputStreamWriter, csvFormat)){
+                for(Object object : body){
+                    List<Object> attributeList = new ArrayList<>();
+                    for(Map.Entry<String, String> entry : header.entrySet()){
+                        String key = entry.getKey();
+                        Object attribute = Util.invokeGetMethodByAttributeName(object, key);
+                        attributeList.add(attribute);
+                    }
+                    csvPrinter.printRecord(attributeList.toArray());
+                }
+                csvPrinter.flush();
+            }
+        }
+
+    }
+
+    static class Util{
+        public static <T> Object invokeGetMethodByAttributeName(T object, String attributeName) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
+            Class clazz = object.getClass();
+            PropertyDescriptor propertyDescriptor = new PropertyDescriptor(attributeName, clazz);
+            Method getMethod = propertyDescriptor.getReadMethod();
+            Object attributeValue = getMethod.invoke(object);
+            return attributeValue;
+        }
     }
     /**
      *
