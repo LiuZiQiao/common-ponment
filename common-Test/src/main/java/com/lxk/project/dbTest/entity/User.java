@@ -1,5 +1,7 @@
 package com.lxk.project.dbTest.entity;
 
+import lombok.Data;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -19,6 +21,16 @@ public class User {
     private String password;
     private Integer age;
     private Integer deleteFlag;
+
+    public User() {}
+
+    public User(Integer id, String name, String password, Integer age, Integer deleteFlag) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.age = age;
+        this.deleteFlag = deleteFlag;
+    }
 
     public Integer getId() {
         return id;

@@ -30,7 +30,7 @@ public class ExcelUtils {
     private static int MAX_CELL = 200;
 
     /**
-     * 解析单个sheet
+     * 默认解析第一个sheet
      * @param file
      * @return Map<String,Object>
      */
@@ -225,6 +225,11 @@ public class ExcelUtils {
 
 
     /**
+     * 数据大于3万行，则导出CSV格式
+     */
+    public static final Integer CSV_SIZE = 30000;
+
+    /**
      *
      * @param list
      * @param title
@@ -237,8 +242,51 @@ public class ExcelUtils {
 
     }
 
+    /**
+     * 导出Excel或CSV格式文件（大于30000行导出CSV格式，小于等于30000行导出xls格式）
+     * @param response HttpServletResponse
+     * @param filename 文件名前缀
+     * @param sheetName 表格名称 csv格式文件，该项无效
+     * @param header 表格头
+     * @param body 表格数据
+     */
+    public static void export(HttpServletResponse response, String filename, String sheetName, Map<String, String> header, List body) {
+
+    }
+    /**
+     *
+     * @param fileName
+     * @param response
+     * @param workbook
+     */
     public static void downLoadExcel(String fileName, HttpServletResponse response, Workbook workbook){
 
+    }
+
+
+    /**
+     *
+     * @param list
+     * @param pojoClass
+     * @param fileName
+     * @param response
+     * @param exportParams
+     */
+    private static void defaultExport(List<?> list, Class<?> pojoClass, String fileName, HttpServletResponse response, ExportParams exportParams) {
+
+
+    }
+
+    /**
+     *
+     * @param list
+     * @param fileName
+     * @param response
+     */
+    private static void defaultExport(List<Map<String, Object>> list, String fileName, HttpServletResponse response) {
+        Workbook workbook = ExcelExportUtil.exportExcel(list, ExcelType.HSSF);
+        if (workbook != null);
+        downLoadExcel(fileName, response, workbook);
     }
 
 }
