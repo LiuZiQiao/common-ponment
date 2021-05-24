@@ -1,12 +1,16 @@
 package com.lxk.project.common.utils;
 
 import com.lxk.project.common.po.DateStyle;
+import com.lxk.project.common.po.ExcelTable;
 import com.lxk.project.common.po.ResultWrapper;
+import com.lxk.project.common.po.WorkBook;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +38,6 @@ import static java.util.regex.Pattern.compile;
  */
 
 public class ExcelUtils {
-
     static String DEFAULT_VALUE = "";
     private static int DEFAULT_SIZE = 2*1024*1024;
     private static final String XLS = "xls";
@@ -237,6 +240,7 @@ public class ExcelUtils {
     }
 
 
+    /** 导出工具 **/
     /**
      * 数据大于3万行，则导出CSV格式
      */
@@ -264,12 +268,36 @@ public class ExcelUtils {
      * @param body 表格数据
      */
     public static void exportExcel(String filename, String sheetName, Map<String, String> header, List body,HttpServletResponse response) {
-//大于csvSize行时导出csv格式
+        export(response, filename, sheetName, header, body, CSV_SIZE);
+    }
+
+    public static void export(HttpServletResponse response, String filename, String sheetName, Map<String, String> header, List body, Integer csvSize) {
+        //大于csvSize行时导出csv格式
         if(CollectionUtils.isNotEmpty(body) && body.size() > csvSize){
             exportCsv(response, filename, header, body);
         }
         else{//导出excel格式
             exportExcel(response, filename, sheetName, header, body);
+        }
+    }
+
+    public static void exportExcel(HttpServletResponse response, String filename, String sheetName, Map<String, String> header, List body) {
+        WorkBook excelTable = new WorkBook();
+        excelTable.addWorksheet(sheetName, header, body);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/vnd.ms-excel;charset=UTF-8");
+        try {
+            String S = filename + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".xls";
+            response.setHeader("Content-Disposition","attachment;filename=" + URLEncoder.encode(S, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("导出失败！", e);
+        }
+        try {
+            excelTable.export(response.getOutputStream());
+            response.getOutputStream().flush();
+            response.getOutputStream().close();
+        } catch (Exception e) {
+            throw new RuntimeException("导出失败！", e);
         }
     }
 
@@ -328,10 +356,9 @@ public class ExcelUtils {
                 csvPrinter.flush();
             }
         }
-
     }
 
-    static class Util{
+    public static class Util{
         public static <T> Object invokeGetMethodByAttributeName(T object, String attributeName) throws IntrospectionException, InvocationTargetException, IllegalAccessException {
             Class clazz = object.getClass();
             PropertyDescriptor propertyDescriptor = new PropertyDescriptor(attributeName, clazz);
@@ -340,6 +367,7 @@ public class ExcelUtils {
             return attributeValue;
         }
     }
+
     /**
      *
      * @param fileName
@@ -348,32 +376,6 @@ public class ExcelUtils {
      */
     public static void downLoadExcel(String fileName, HttpServletResponse response, Workbook workbook){
 
-    }
-
-
-    /**
-     *
-     * @param list
-     * @param pojoClass
-     * @param fileName
-     * @param response
-     * @param exportParams
-     */
-    private static void defaultExport(List<?> list, Class<?> pojoClass, String fileName, HttpServletResponse response, ExportParams exportParams) {
-
-
-    }
-
-    /**
-     *
-     * @param list
-     * @param fileName
-     * @param response
-     */
-    private static void defaultExport(List<Map<String, Object>> list, String fileName, HttpServletResponse response) {
-        Workbook workbook = ExcelExportUtil.exportExcel(list, ExcelType.HSSF);
-        if (workbook != null);
-        downLoadExcel(fileName, response, workbook);
     }
 
 }
