@@ -29,6 +29,7 @@
         <module>common-db</module>
         <module>common-utils</module>
         <module>common-pojo</module>
+        <module>common-redis</module>
     </modules>
 
     <properties>
