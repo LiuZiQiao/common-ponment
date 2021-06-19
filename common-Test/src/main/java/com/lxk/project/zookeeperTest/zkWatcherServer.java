@@ -1,20 +1,24 @@
-package com.lxk.project.util;
+package com.lxk.project.zookeeperTest;
 
+import com.lxk.project.Api.WatcherApi;
 import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @Description TODO
  * @Author liuxiaokun@e6yun.com
- * @Created Date: 2021/6/18 16:29
- * @ClassName WatcherApi
+ * @Created Date: 2021/6/19 11:53
+ * @ClassName zkWatcherServer
  * @Remark
  */
 
-public class WatcherApi implements Watcher {
-    private static final Logger logger = LoggerFactory.getLogger(WatcherApi.class);
+public class zkWatcherServer extends WatcherApi {
+    private static final Logger logger = LoggerFactory.getLogger(zkWatcherServer.class);
+    /**
+     * 实现WatcherApi，感知数据变动
+     * @param watchedEvent
+     */
     @Override
     public void process(WatchedEvent watchedEvent) {
         logger.info("【Watcher监听事件】={}",watchedEvent.getState());

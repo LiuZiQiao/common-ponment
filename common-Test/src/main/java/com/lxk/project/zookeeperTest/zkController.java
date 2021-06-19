@@ -1,10 +1,11 @@
 package com.lxk.project.zookeeperTest;
 
-import com.lxk.project.util.ZkApi;
+import com.lxk.project.Api.ZkApi;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @Description TODO
@@ -22,10 +23,44 @@ public class zkController {
     ZkApi zkApi;
 
     @GetMapping("/init")
-    public void init(){
+    public void init() {
         zkApi.init();
     }
 
+    @PostMapping("/createNode")
+    public boolean createNode(@RequestParam("path") String path, @RequestParam("data") String data) {
+        boolean node = zkApi.createNode(path, data);
+        zkApi.getData(path, new zkWatcherServer());
+        return node;
+    }
 
+    @PostMapping("/getDataOnWatcher")
+    public String getDataOnWatcher(@RequestParam("path") String path) {
+        return zkApi.getData(path, new zkWatcherServer());
+    }
+
+    @PostMapping("/updateData")
+    public void updateData(@RequestParam("path") String path, @RequestParam("data") String data) {
+        zkApi.updateNode(path, data);
+    }
+
+    @PostMapping("/delete")
+    public void delete(@RequestParam("path") String path) {
+        zkApi.deleteNode(path);
+    }
+
+    @PostMapping("/getChildren")
+    public List getChildren(@RequestParam("path") String path) {
+        try {
+            List<String> children = zkApi.getChildren(path);
+            System.out.println(children);
+            return children;
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

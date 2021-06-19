@@ -1,4 +1,4 @@
-package com.lxk.project.util;
+package com.lxk.project.Api;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -120,6 +119,22 @@ public class ZkApi {
      * @param path
      * @return
      */
+    public  String getData(String path){
+        try {
+            Stat stat=new Stat();
+            byte[] bytes=zkClient.getData(path,true,stat);
+            return  new String(bytes);
+        }catch (Exception e){
+            e.printStackTrace();
+            return  null;
+        }
+    }
+
+    /**
+     * 获取指定节点的值,并感知数据是否有变动
+     * @param path
+     * @return
+     */
     public  String getData(String path,Watcher watcher){
         try {
             Stat stat=new Stat();
@@ -131,18 +146,18 @@ public class ZkApi {
         }
     }
 
-
     /**
-     * 测试方法  初始化
+     * 启动测试连接，创建，获取和删除。
+     * 这里Watcher使用默认的true，默认不再需要感知
      */
     @PostConstruct
     public  void init(){
-        String path="/zk-watcher";
-        logger.info("【执行初始化测试方法。。。。。。。。。。。。】");
-        createNode(path,"测试");
-        String value=getData(path,new WatcherApi());
-        logger.info("【执行初始化测试方法getData返回值。。。。。。。。。。。。】={}",value);
-
+        String path="/zk-watcher-test";
+        String data="zk初始化连接测试";
+        createNode(path,data);
+        logger.info("【执行初始化测试方法】---{}",path);
+        String value=getData(path);
+        logger.info("【执行初始化测试方法getData返回值】={}",value);
         // 删除节点出发 监听事件
         deleteNode(path);
     }
