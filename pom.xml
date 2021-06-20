@@ -29,6 +29,8 @@
         <module>common-db</module>
         <module>common-utils</module>
         <module>common-pojo</module>
+        <module>common-redis</module>
+        <module>common-zookeeper</module>
     </modules>
 
     <properties>
