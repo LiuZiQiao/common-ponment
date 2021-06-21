@@ -1,7 +1,8 @@
 package com.lxk.project.zookeeperTest;
 
 import com.lxk.project.Api.ZkApi;
-import org.apache.zookeeper.KeeperException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +19,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/zookeeper")
 public class zkController {
+    private static final Logger logger = LoggerFactory.getLogger(zkController.class);
 
     @Autowired
-    ZkApi zkApi;
+    private ZkApi zkApi;
 
     @GetMapping("/init")
     public void init() {
@@ -51,16 +53,18 @@ public class zkController {
 
     @PostMapping("/getChildren")
     public List getChildren(@RequestParam("path") String path) {
-        try {
-            List<String> children = zkApi.getChildren(path);
-            System.out.println(children);
-            return children;
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        List<String> children = zkApi.getChildren(path);
+        System.out.println(children);
+        return children;
+    }
+    @PostMapping("/createEphemeralSequential")
+    public String createEphemeralSequential(@RequestParam("path") String path) {
+        return zkApi.createEphemeralSequential(path, "");
+    }
+
+    @GetMapping("getLock")
+    public void getLock() {
+
     }
 
 }
