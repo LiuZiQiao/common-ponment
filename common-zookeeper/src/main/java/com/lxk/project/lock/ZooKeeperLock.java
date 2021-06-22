@@ -11,8 +11,9 @@ package com.lxk.project.lock;
 public interface ZooKeeperLock {
 
     boolean lock(String node);
-    boolean release();
-    boolean exists();
 
+    boolean release();
+
+    boolean exists();
 
 }

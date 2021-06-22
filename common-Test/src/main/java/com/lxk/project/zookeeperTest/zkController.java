@@ -1,6 +1,8 @@
 package com.lxk.project.zookeeperTest;
 
 import com.lxk.project.Api.ZkApi;
+import com.lxk.project.lock.ZKLock;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class zkController {
 
     @Autowired
     private ZkApi zkApi;
+
+    @Autowired
+    private ZKLock zkLock;
 
     @GetMapping("/init")
     public void init() {
@@ -57,14 +62,27 @@ public class zkController {
         System.out.println(children);
         return children;
     }
+
+    /**
+     * 创建临时顺序节点
+     *
+     * @param path
+     * @return
+     */
     @PostMapping("/createEphemeralSequential")
     public String createEphemeralSequential(@RequestParam("path") String path) {
-        return zkApi.createEphemeralSequential(path, "");
+        return zkApi.createEphemeralSequential(path, "childNode");
     }
 
-    @GetMapping("getLock")
+    @GetMapping("/getLock")
     public void getLock() {
+        zkLock.lock();
+    }
 
+
+    @GetMapping("/exist")
+    public Stat exist(@RequestParam("path") String path) {
+        return zkApi.exists(path, true);
     }
 
 }

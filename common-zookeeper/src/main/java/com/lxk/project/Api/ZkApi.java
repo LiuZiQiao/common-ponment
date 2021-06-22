@@ -85,7 +85,7 @@ public class ZkApi {
     public String createEphemeralSequential(String path, String childPath) {
         path = path + "/" + childPath;
         try {
-            return zkClient.create(path, childPath.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+            return zkClient.create(path, "".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
