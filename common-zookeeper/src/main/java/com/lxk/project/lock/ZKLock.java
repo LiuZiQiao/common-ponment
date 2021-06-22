@@ -78,6 +78,7 @@ public class ZKLock implements Watcher {
 
     public void lock() {
         try {
+            this.init();
             //在根节点下创建临时顺序节点，返回值为创建的节点路径
             currentLock = zkClient.create(tmpRootLock + "/" + lockName, new byte[0],
                     ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
