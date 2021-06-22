@@ -1,7 +1,10 @@
 package com.lxk.project.zookeeperTest;
 
 import com.lxk.project.Api.ZkApi;
-import org.apache.zookeeper.KeeperException;
+import com.lxk.project.lock.ZKLock;
+import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +21,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/zookeeper")
 public class zkController {
+    private static final Logger logger = LoggerFactory.getLogger(zkController.class);
 
     @Autowired
-    ZkApi zkApi;
+    private ZkApi zkApi;
+
+    @Autowired
+    private ZKLock zkLock;
 
     @GetMapping("/init")
     public void init() {
@@ -51,16 +58,31 @@ public class zkController {
 
     @PostMapping("/getChildren")
     public List getChildren(@RequestParam("path") String path) {
-        try {
-            List<String> children = zkApi.getChildren(path);
-            System.out.println(children);
-            return children;
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+        List<String> children = zkApi.getChildren(path);
+        System.out.println(children);
+        return children;
+    }
+
+    /**
+     * 创建临时顺序节点
+     *
+     * @param path
+     * @return
+     */
+    @PostMapping("/createEphemeralSequential")
+    public String createEphemeralSequential(@RequestParam("path") String path) {
+        return zkApi.createEphemeralSequential(path, "childNode");
+    }
+
+    @GetMapping("/getLock")
+    public void getLock() {
+        zkLock.lock();
+    }
+
+
+    @GetMapping("/exist")
+    public Stat exist(@RequestParam("path") String path) {
+        return zkApi.exists(path, true);
     }
 
 }
