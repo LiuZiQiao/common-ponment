@@ -1,5 +1,6 @@
 package com.lxk.project.lock;
 
+import com.lxk.project.Api.ZkApi;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,10 @@ public class ZKLock implements Watcher {
 
     @Autowired
     private ZooKeeper zkClient;
+
+    @Autowired
+    private ZkApi zkApi;
+
     /**
      * 当前锁
      */
@@ -43,15 +48,14 @@ public class ZKLock implements Watcher {
      */
     private CountDownLatch latch;
 
-    private void init(){
-        this.lockName = "" + System.nanoTime();
+    private void init() {
         try {
             createZNode(ROOT_LOCK, CreateMode.PERSISTENT);
-            tmpRootLock = ROOT_LOCK + "/" + lockName;
-            /**
-             * zk临时节点下不能创建临时顺序节点
-             */
-            createZNode(tmpRootLock, CreateMode.PERSISTENT);
+//            tmpRootLock = ROOT_LOCK + "/" + lockName;
+//            /**
+//             * zk临时节点下不能创建临时顺序节点
+//             */
+//            createZNode(tmpRootLock, CreateMode.PERSISTENT);
         } catch (KeeperException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -69,7 +73,7 @@ public class ZKLock implements Watcher {
      */
     private void createZNode(String node, CreateMode mode) throws KeeperException, InterruptedException {
         //获取根节点状态
-        Stat stat = zkClient.exists(node, false);
+        Stat stat = zkApi.exists(node, false);
         //如果根节点不存在，则创建根节点，根节点类型为永久节点
         if (stat == null) {
             zkClient.create(node, new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
@@ -79,11 +83,12 @@ public class ZKLock implements Watcher {
     public void lock() {
         try {
             this.init();
+            this.tmpRootLock = "" + System.nanoTime();
             //在根节点下创建临时顺序节点，返回值为创建的节点路径
-            currentLock = zkClient.create(tmpRootLock + "/" + lockName, new byte[0],
+            currentLock = zkClient.create(ROOT_LOCK + "/" + tmpRootLock, new byte[0],
                     ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
             //获取根节点下的所有临时顺序节点，不设置监视器
-            List<String> children = zkClient.getChildren(tmpRootLock, false);
+            List<String> children = zkClient.getChildren(ROOT_LOCK, false);
             //对根节点下的所有临时顺序节点进行从小到大排序
             children.sort(null);
             //判断当前节点是否为最小节点，如果是则获取锁，若不是，则找到自己的前一个节点，监听其存在状态
@@ -92,7 +97,7 @@ public class ZKLock implements Watcher {
                 //获取当前节点前一个节点的路径
                 String prev = children.get(curIndex - 1);
                 //监听当前节点的前一个节点的状态，null则节点不存在
-                Stat stat = zkClient.exists(tmpRootLock + "/" + prev, true);
+                Stat stat = zkClient.exists("/"+tmpRootLock + "/" + prev, true);
                 //此处再次判断该节点是否存在
                 if (stat != null) {
                     latch = new CountDownLatch(1);
@@ -113,9 +118,9 @@ public class ZKLock implements Watcher {
         try {
             //删除创建的节点
             zkClient.delete(currentLock, -1);
-            List<String> children = zkClient.getChildren(tmpRootLock, false);
+            List<String> children = zkClient.getChildren(ROOT_LOCK, false);
             if (children.size() == 0) {
-                zkClient.delete(tmpRootLock, -1);
+                zkClient.delete(ROOT_LOCK+"/"+tmpRootLock, -1);
                 //关闭zookeeper连接
                 zkClient.close();
             }

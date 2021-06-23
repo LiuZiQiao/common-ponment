@@ -75,14 +75,16 @@ public class zkController {
     }
 
     @GetMapping("/getLock")
-    public void getLock() {
+    public void getLock() throws InterruptedException {
         zkLock.lock();
+        Thread.sleep(10000);
+        zkLock.unlock();
     }
 
 
     @GetMapping("/exist")
     public Stat exist(@RequestParam("path") String path) {
-        return zkApi.exists(path, true);
+        return zkApi.exists(path, false);
     }
 
 }
